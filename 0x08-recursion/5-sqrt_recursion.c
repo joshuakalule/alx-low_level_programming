@@ -1,4 +1,5 @@
 #include "main.h"
+#include <stdio.h>
 
 int helper(int n, int i);
 
@@ -26,10 +27,18 @@ int _sqrt_recursion(int n)
  */
 int helper(int n, int i)
 {
-	if (i <= 0)
+	if (i <= 1)
 		return (-1);
-	if (i * i == n)
+	if (i * i > n)
+	{
+		return (helper(n, 0.5 * (i + (n / i))));
+	}
+	else if (i * i < n)
+	{
+		return (helper(n, 0.5 * (i - (n / i))));
+	}
+	else
+	{
 		return (i);
-
-	return (helper(n, i - 1));
+	}
 }
