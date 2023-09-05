@@ -81,6 +81,8 @@ char **strtow(char *str)
 		return (NULL);
 
 	x = get_word_count(str);
+	if (x == 0)
+		return (NULL);
 	words = malloc(sizeof(words) * (x + 1));
 	if (words == NULL)
 		return (NULL);
