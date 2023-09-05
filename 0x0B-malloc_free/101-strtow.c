@@ -1,59 +1,68 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "main.h"
 
 /**
- * record_word - helper for main function
- * @p: pointer to array
- * @size: size of word
- * @str: pointer to source string
- * @i: pointer to index of character in str
+ * get_word_count - number of words in the string
+ * @str: string
+ *
+ * Return: number of words in the string
  */
-void record_word(char *p, int size, char *str, int *i)
+int get_word_count(char *str)
 {
-	int n = 0;
+	int i, count = 0;
+	int word = 0;
 
-	while (1)
+	for (i = 0; ; i++)
 	{
-		if (n >= size)
-			break;
-		if (str[*i] == ' ')
+		if (str[i] == '\0')
 		{
-			*i += 1;
-			continue;
+			if (word == 1)
+				count += 1;
+			break;
 		}
-		p[n] = str[*i];
-		n++;
-		*i += 1;
+		else if (str[i] == ' ')
+		{
+			if (word == 1)
+			{
+				count += 1;
+				word = 0;
+			}
+		}
+		else
+		{
+			word = 1;
+		}
 	}
+	return (count);
 }
 
 /**
- * get_size - helper for main function
- * @str: string
- * @k: iterator
+ * add_word - adds a word to the words array
+ * @buffer: current word in the buffer to be added to the array
+ * @size: size of the word in the buffer
+ * @array: array
+ * @words: number of words in the array
  *
- * Return: size of one string
+ * Return: 0 (Success) 1 (Fail)
  */
-int get_size(char *str, int *k)
+int add_word(char *buffer, size_t size, char **array, int *words)
 {
-	int prev = ' ';
-	int tmp_size = 0;
+	char *ptr;
 
-	for (; str[*k] != '\0'; *k += 1)
-	{
-		if (prev != ' ' && str[*k] == ' ')
-			break;
-		if (str[*k] == ' ')
-		{
-			prev = str[*k];
-			continue;
-		}
-		tmp_size++;
-		prev = str[*k];
-	}
-	return (tmp_size);
+	ptr = malloc(sizeof(char) * (size + 1));
+	if (ptr == NULL)
+		return (1);
+
+	memcpy(ptr, buffer, size);
+	ptr[size] = '\0';
+
+	array[*words] = ptr;
+	*words += 1;
+	return (0);
 }
+
 
 /**
  * strtow - splits a string into words
@@ -64,43 +73,41 @@ int get_size(char *str, int *k)
  */
 char **strtow(char *str)
 {
-	int j, size, i = 0, k = 0, words = 0;
-	char prev = ' ';
-	char **ptr;
+	char **words;
+	int i, x, word_count;
+	char buffer[1024] = {'\0'};
 
-	if (str == NULL || *str == '\0' || (*str == ' ' && *(str + 1) == '\0'))
+	if (str == NULL || str[0] == '\0')
 		return (NULL);
 
-	for (i = 0; str[i] != '\0'; i++)
+	x = get_word_count(str);
+	words = malloc(sizeof(words) * (x + 1));
+	if (words == NULL)
+		return (NULL);
+	words[x] = NULL;
+
+	word_count = 0;
+	x = 0;
+	for (i = 0;; i++)
 	{
-		if (str[i] != ' '  && prev == ' ')
+		if (str[i] != ' ' && str[i] != '\0')
 		{
-			words++;
+			buffer[x++] = str[i];
 		}
-		prev = str[i];
-	}
-	ptr = malloc(sizeof(*ptr) * (words + 1));
-	ptr[words] = malloc(1);
-	*ptr[words] = '\0';
-	if (ptr == NULL)
-		return (NULL);
-	i = 0;
-	for (j = 0; j < words; j++)
-	{
-		prev = ' ';
-		size = get_size(str, &k);
-		ptr[j] = malloc(sizeof(char) * (size + 1));
-		if (ptr[j] == NULL)
+		else
 		{
-			while (j--)
+			if (buffer[0] != '\0')
 			{
-				free(ptr[j]);
+				if (add_word(buffer, x, words, &word_count) != 0)
+					return (NULL);
+				/* reset buffer */
+				memset(buffer, 0, x);
+				x = 0;
 			}
-			free(ptr);
-			return (NULL);
+			/* termiantion case */
+			if (str[i] == '\0')
+				break;
 		}
-		ptr[j][size] = '\0';
-		record_word(ptr[j], size, str, &i);
 	}
-	return (ptr);
+	return (words);
 }
