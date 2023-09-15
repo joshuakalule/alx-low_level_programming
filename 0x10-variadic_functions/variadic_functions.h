@@ -6,6 +6,11 @@
 #include <stdarg.h>
 #endif /* _STDARG_H_ */
 
+/**
+ * struct get_arg - get an argument
+ * @type: type of argument
+ * @f: function to run
+ */
 typedef struct get_arg
 {
 	char *type;
