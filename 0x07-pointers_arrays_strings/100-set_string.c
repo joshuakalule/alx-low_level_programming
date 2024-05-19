@@ -10,16 +10,5 @@
  */
 void set_string(char **s, char *to)
 {
-	size_t i, len;
-
-	if (!s || !to)
-		return;
-	for (i = 0; to[i] != '\0'; i++)
-		;
-	len = i + 1;
-
-	*s = malloc(sizeof(char) * len);
-	if (*s == NULL)
-		return;
-	memcpy(*s, to, len - 1);
+	*s = to;
 }
